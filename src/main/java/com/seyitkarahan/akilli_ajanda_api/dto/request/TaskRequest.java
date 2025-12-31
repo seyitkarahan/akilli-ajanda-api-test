@@ -5,6 +5,7 @@ import com.seyitkarahan.akilli_ajanda_api.enums.TaskStatus;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -20,4 +21,5 @@ public class TaskRequest {
     private ImportanceLevel importanceLevel;
     private Long categoryId;
     private Long recurringRuleId;
+    private Set<Long> tagIds;
 }

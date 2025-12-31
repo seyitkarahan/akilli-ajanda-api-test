@@ -73,7 +73,10 @@ public class AuthService {
         userSettingsRepository.save(settings);
 
         String token = jwtService.generateToken(user.getEmail());
-        return new AuthResponse(token);
+        return AuthResponse.builder()
+                .token(token)
+                .id(user.getId())
+                .build();
     }
 
     public AuthResponse login(LoginRequest request) {
@@ -87,6 +90,9 @@ public class AuthService {
                 .orElseThrow(() -> new UserNotFoundException("Bu e-posta adresine sahip kullanıcı bulunamadı: " + request.getEmail()));
 
         String token = jwtService.generateToken(user.getEmail());
-        return new AuthResponse(token);
+        return AuthResponse.builder()
+                .token(token)
+                .id(user.getId())
+                .build();
     }
 }

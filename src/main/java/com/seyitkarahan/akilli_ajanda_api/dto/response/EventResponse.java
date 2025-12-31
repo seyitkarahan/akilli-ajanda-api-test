@@ -3,6 +3,7 @@ package com.seyitkarahan.akilli_ajanda_api.dto.response;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -21,4 +22,5 @@ public class EventResponse {
     private Double longitude;
     private Long userId;
     private Long categoryId;
+    private Set<TagResponse> tags;
 }

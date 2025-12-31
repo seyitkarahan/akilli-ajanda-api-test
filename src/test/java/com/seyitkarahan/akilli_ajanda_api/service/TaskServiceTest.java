@@ -3,6 +3,7 @@ package com.seyitkarahan.akilli_ajanda_api.service;
 import com.seyitkarahan.akilli_ajanda_api.dto.request.TaskRequest;
 import com.seyitkarahan.akilli_ajanda_api.dto.response.TaskResponse;
 import com.seyitkarahan.akilli_ajanda_api.entity.Category;
+import com.seyitkarahan.akilli_ajanda_api.entity.Tag;
 import com.seyitkarahan.akilli_ajanda_api.entity.Task;
 import com.seyitkarahan.akilli_ajanda_api.entity.User;
 import com.seyitkarahan.akilli_ajanda_api.exception.UnauthorizedTaskAccessException;
@@ -17,8 +18,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -40,6 +43,9 @@ class TaskServiceTest {
 
     @Mock
     private RecurringTaskRuleRepository recurringTaskRuleRepository;
+
+    @Mock
+    private TagRepository tagRepository;
 
     @Mock
     private Authentication authentication;
@@ -139,6 +145,36 @@ class TaskServiceTest {
         verify(categoryRepository).findById(5L);
     }
 
+    @Test
+    void createTask_withTags_shouldAssignTags() {
+        Tag tag = Tag.builder()
+                .id(100L)
+                .name("Urgent")
+                .user(user)
+                .build();
+
+        TaskRequest request = TaskRequest.builder()
+                .title("Tagged Task")
+                .tagIds(Set.of(100L))
+                .build();
+
+        Task savedTask = Task.builder()
+                .id(11L)
+                .title("Tagged Task")
+                .user(user)
+                .tags(Set.of(tag))
+                .build();
+
+        when(tagRepository.findAllById(request.getTagIds())).thenReturn(List.of(tag));
+        when(taskRepository.save(any(Task.class))).thenReturn(savedTask);
+
+        TaskResponse response = taskService.createTask(request);
+
+        assertNotNull(response);
+        assertEquals(1, response.getTags().size());
+        verify(tagRepository).findAllById(request.getTagIds());
+    }
+
     // ---------------- UPDATE TASK ----------------
 
     @Test
@@ -177,4 +213,3 @@ class TaskServiceTest {
                 () -> taskService.deleteTask(10L));
     }
 }
-

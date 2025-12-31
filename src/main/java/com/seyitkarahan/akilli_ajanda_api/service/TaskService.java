@@ -1,21 +1,22 @@
 package com.seyitkarahan.akilli_ajanda_api.service;
 
-import com.seyitkarahan.akilli_ajanda_api.entity.RecurringTaskRule;
+import com.seyitkarahan.akilli_ajanda_api.dto.response.TagResponse;
+import com.seyitkarahan.akilli_ajanda_api.entity.*;
 import com.seyitkarahan.akilli_ajanda_api.exception.*;
 import com.seyitkarahan.akilli_ajanda_api.repository.RecurringTaskRuleRepository;
+import com.seyitkarahan.akilli_ajanda_api.repository.TagRepository;
 import org.springframework.stereotype.Service;
 
 import com.seyitkarahan.akilli_ajanda_api.dto.request.TaskRequest;
 import com.seyitkarahan.akilli_ajanda_api.dto.response.TaskResponse;
-import com.seyitkarahan.akilli_ajanda_api.entity.Category;
-import com.seyitkarahan.akilli_ajanda_api.entity.Task;
-import com.seyitkarahan.akilli_ajanda_api.entity.User;
 import com.seyitkarahan.akilli_ajanda_api.repository.CategoryRepository;
 import com.seyitkarahan.akilli_ajanda_api.repository.TaskRepository;
 import com.seyitkarahan.akilli_ajanda_api.repository.UserRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,13 +26,16 @@ public class TaskService {
     private final UserRepository userRepository;
     private final CategoryRepository categoryRepository;
     private final RecurringTaskRuleRepository recurringTaskRuleRepository;
+    private final TagRepository tagRepository;
 
     public TaskService(TaskRepository taskRepository, UserRepository userRepository,
-                       CategoryRepository categoryRepository, RecurringTaskRuleRepository recurringTaskRuleRepository) {
+                       CategoryRepository categoryRepository, RecurringTaskRuleRepository recurringTaskRuleRepository,
+                       TagRepository tagRepository) {
         this.taskRepository = taskRepository;
         this.userRepository = userRepository;
         this.categoryRepository = categoryRepository;
         this.recurringTaskRuleRepository = recurringTaskRuleRepository;
+        this.tagRepository = tagRepository;
     }
 
     public List<TaskResponse> getAllTasks(Long categoryId) {
@@ -90,6 +94,17 @@ public class TaskService {
             task.setRecurringRule(rule);
         }
 
+        if (request.getTagIds() != null && !request.getTagIds().isEmpty()) {
+            List<Tag> tags = tagRepository.findAllById(request.getTagIds());
+            // Validate tags belong to user
+            for (Tag tag : tags) {
+                if (!tag.getUser().getId().equals(user.getId())) {
+                    throw new UnauthorizedTaskAccessException("You cannot assign a tag that does not belong to you");
+                }
+            }
+            task.setTags(new HashSet<>(tags));
+        }
+
         return mapToResponse(taskRepository.save(task));
     }
 
@@ -128,6 +143,19 @@ public class TaskService {
             task.setRecurringRule(null);
         }
 
+        if (request.getTagIds() != null) {
+            List<Tag> tags = tagRepository.findAllById(request.getTagIds());
+            // Validate tags belong to user
+            for (Tag tag : tags) {
+                if (!tag.getUser().getId().equals(user.getId())) {
+                    throw new UnauthorizedTaskAccessException("You cannot assign a tag that does not belong to you");
+                }
+            }
+            task.setTags(new HashSet<>(tags));
+        } else {
+            task.getTags().clear();
+        }
+
         return mapToResponse(taskRepository.save(task));
     }
 
@@ -150,6 +178,15 @@ public class TaskService {
     }
 
     private TaskResponse mapToResponse(Task task) {
+        Set<TagResponse> tagResponses = task.getTags().stream()
+                .map(tag -> TagResponse.builder()
+                        .id(tag.getId())
+                        .name(tag.getName())
+                        .color(tag.getColor())
+                        .userId(tag.getUser().getId())
+                        .build())
+                .collect(Collectors.toSet());
+
         return TaskResponse.builder()
                 .id(task.getId())
                 .title(task.getTitle())
@@ -161,6 +198,7 @@ public class TaskService {
                 .userId(task.getUser().getId())
                 .categoryId(task.getCategory() != null ? task.getCategory().getId() : null)
                 .recurringRuleId(task.getRecurringRule() != null ? task.getRecurringRule().getId() : null)
+                .tags(tagResponses)
                 .build();
     }
 }

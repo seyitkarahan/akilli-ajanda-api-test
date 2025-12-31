@@ -4,9 +4,11 @@ import com.seyitkarahan.akilli_ajanda_api.dto.request.EventRequest;
 import com.seyitkarahan.akilli_ajanda_api.dto.response.EventResponse;
 import com.seyitkarahan.akilli_ajanda_api.entity.Category;
 import com.seyitkarahan.akilli_ajanda_api.entity.Event;
+import com.seyitkarahan.akilli_ajanda_api.entity.Tag;
 import com.seyitkarahan.akilli_ajanda_api.entity.User;
 import com.seyitkarahan.akilli_ajanda_api.repository.CategoryRepository;
 import com.seyitkarahan.akilli_ajanda_api.repository.EventRepository;
+import com.seyitkarahan.akilli_ajanda_api.repository.TagRepository;
 import com.seyitkarahan.akilli_ajanda_api.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,9 +21,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -37,6 +39,9 @@ class EventServiceTest {
 
     @Mock
     private CategoryRepository categoryRepository;
+
+    @Mock
+    private TagRepository tagRepository;
 
     @InjectMocks
     private EventService eventService;
@@ -196,6 +201,36 @@ class EventServiceTest {
 
         assertThrows(RuntimeException.class,
                 () -> eventService.createEvent(request));
+    }
+
+    @Test
+    void createEvent_withTags_shouldAssignTags() {
+        Tag tag = Tag.builder()
+                .id(100L)
+                .name("Important")
+                .user(user)
+                .build();
+
+        EventRequest request = EventRequest.builder()
+                .title("Tagged Event")
+                .tagIds(Set.of(100L))
+                .build();
+
+        Event savedEvent = Event.builder()
+                .id(11L)
+                .title("Tagged Event")
+                .user(user)
+                .tags(Set.of(tag))
+                .build();
+
+        when(tagRepository.findAllById(request.getTagIds())).thenReturn(List.of(tag));
+        when(eventRepository.save(any(Event.class))).thenReturn(savedEvent);
+
+        EventResponse response = eventService.createEvent(request);
+
+        assertNotNull(response);
+        assertEquals(1, response.getTags().size());
+        verify(tagRepository).findAllById(request.getTagIds());
     }
 
     @Test
