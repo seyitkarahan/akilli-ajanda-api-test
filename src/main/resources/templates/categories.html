@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Categories</title>
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+<body>
+
+<div class="sidebar">
+    <div class="sidebar-header">Akıllı Ajanda</div>
+    <div class="sidebar-menu">
+        <a th:href="@{/dashboard}">Dashboard</a>
+        <a class="active">Categories</a>
+        <a>Events</a>
+        <a>Tasks</a>
+        <a>Notes</a>
+    </div>
+</div>
+
+<div class="main">
+
+    <div class="topbar">
+        <div class="topbar-title">Categories</div>
+        <a href="/logout" class="logout-btn">Logout</a>
+    </div>
+
+    <div class="content">
+
+        <!-- Add Category -->
+        <div class="card" style="margin-bottom:20px;">
+            <form th:action="@{/categories}" method="post" class="category-form">
+                <input type="text"
+                       name="name"
+                       placeholder="Yeni kategori adı"
+                       required>
+                <button type="submit" class="btn-add">Ekle</button>
+            </form>
+        </div>
+
+        <!-- Category List -->
+        <div class="card">
+            <table class="category-table">
+                <thead>
+                <tr>
+                    <th>Category Name</th>
+                    <th style="text-align:right;">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                <tr th:each="category : ${categories}">
+                    <td>
+                        <form th:action="@{/categories/update/{id}(id=${category.id})}"
+                              method="post"
+                              class="category-form">
+                            <input type="text"
+                                   name="name"
+                                   th:value="${category.name}"
+                                   required>
+                            <button type="submit" class="btn-update">Güncelle</button>
+                        </form>
+                    </td>
+
+                    <td class="category-actions">
+                        <form th:action="@{/categories/delete/{id}(id=${category.id})}"
+                              method="post">
+                            <button type="submit" class="btn-delete">Sil</button>
+                        </form>
+                    </td>
+                </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>

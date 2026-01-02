@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Tasks</title>
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <div class="sidebar-header">Akıllı Ajanda</div>
+    <div class="sidebar-menu">
+        <a th:href="@{/dashboard}">Dashboard</a>
+        <a th:href="@{/categories}">Categories</a>
+        <a>Events</a>
+        <a class="active">Tasks</a>
+        <a>Notes</a>
+    </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+        <div class="topbar-title">Tasks</div>
+        <a href="/logout" class="logout-btn">Logout</a>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+        <!-- ADD TASK -->
+        <div class="card" style="margin-bottom:20px;">
+            <form th:action="@{/tasks}" method="post" class="task-form">
+
+                <input type="text"
+                       name="title"
+                       placeholder="Task title"
+                       required>
+
+                <textarea name="description"
+                          placeholder="Description"></textarea>
+
+                <select name="status">
+                    <option th:each="s : ${statuses}"
+                            th:value="${s}"
+                            th:text="${s}">
+                    </option>
+                </select>
+
+                <select name="importanceLevel">
+                    <option th:each="i : ${importanceLevels}"
+                            th:value="${i}"
+                            th:text="${i}">
+                    </option>
+                </select>
+
+                <select name="categoryId">
+                    <option value="">No Category</option>
+                    <option th:each="c : ${categories}"
+                            th:value="${c.id}"
+                            th:text="${c.name}">
+                    </option>
+                </select>
+
+                <select name="tagIds" multiple class="tag-select">
+                    <option th:each="t : ${tags}"
+                            th:value="${t.id}"
+                            th:text="${t.name}">
+                    </option>
+                </select>
+
+                <button type="submit" class="btn-add">Add Task</button>
+            </form>
+        </div>
+
+        <!-- TASK LIST -->
+        <div class="card">
+            <table class="task-table">
+                <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Status</th>
+                    <th>Importance</th>
+                    <th style="text-align:right;">Actions</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr th:each="task : ${tasks}">
+
+                    <!-- UPDATE -->
+                    <td>
+                        <form th:action="@{/tasks/update/{id}(id=${task.id})}"
+                              method="post"
+                              class="task-inline-form">
+
+                            <input type="text"
+                                   name="title"
+                                   th:value="${task.title}"
+                                   required>
+                    </td>
+
+                    <td>
+                        <select name="status">
+                            <option th:each="s : ${statuses}"
+                                    th:value="${s}"
+                                    th:text="${s}"
+                                    th:selected="${s == task.status}">
+                            </option>
+                        </select>
+                    </td>
+
+                    <td>
+                        <select name="importanceLevel">
+                            <option th:each="i : ${importanceLevels}"
+                                    th:value="${i}"
+                                    th:text="${i}"
+                                    th:selected="${i == task.importanceLevel}">
+                            </option>
+                        </select>
+                    </td>
+
+                    <td class="task-actions">
+                        <button type="submit" class="btn-update">Güncelle</button>
+                        </form>
+
+                        <!-- DELETE -->
+                        <form th:action="@{/tasks/delete/{id}(id=${task.id})}"
+                              method="post">
+                            <button type="submit" class="btn-delete">Sil</button>
+                        </form>
+                    </td>
+
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>

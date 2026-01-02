@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Giriş Yap</title>
+    <link rel="stylesheet" th:href="@{/css/auth.css}">
+</head>
+<body>
+
+<div class="auth-container">
+    <h2>Hoş Geldin 👋</h2>
+
+    <div th:if="${error}" class="error-message" th:text="${error}"></div>
+
+    <form th:action="@{/login}" method="post">
+
+        <div class="form-group">
+            <input type="email" name="email" placeholder=" " required>
+            <label>Email</label>
+        </div>
+
+        <div class="form-group">
+            <input type="password" name="password" placeholder=" " required>
+            <label>Şifre</label>
+        </div>
+
+        <button class="btn" type="submit">Giriş Yap</button>
+    </form>
+
+    <div class="auth-footer">
+        Hesabın yok mu?
+        <a th:href="@{/register}">Kayıt Ol</a>
+    </div>
+</div>
+
+</body>
+</html>

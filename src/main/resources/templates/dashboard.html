@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+    <div class="sidebar-header">
+        Akıllı Ajanda
+    </div>
+
+    <div class="sidebar-menu">
+        <a href="#" class="active">Dashboard</a>
+        <a th:href="@{/categories}">Categories</a>
+        <a th:href="@{/events}">Events</a>
+        <a href="#">Event Notifications</a>
+        <a href="#">Image Files</a>
+        <a href="#">Notes</a>
+        <a href="#">Tags</a>
+        <a th:href="@{/tasks}">Tasks</a>
+        <a href="#">Task Notifications</a>
+        <a href="#">User Settings</a>
+    </div>
+</div>
+
+<!-- Main -->
+<div class="main">
+
+    <!-- Topbar -->
+    <div class="topbar">
+        <div class="topbar-title">Dashboard</div>
+
+        <div class="topbar-actions">
+            <a href="/logout" class="logout-btn">Logout</a>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+
+        <div class="cards">
+            <div class="card">
+                <h3>Total Tasks</h3>
+                <p>0</p>
+            </div>
+
+            <div class="card">
+                <h3>Upcoming Events</h3>
+                <p>0</p>
+            </div>
+
+            <div class="card">
+                <h3>Notes</h3>
+                <p>0</p>
+            </div>
+
+            <div class="card">
+                <h3>Categories</h3>
+                <p>0</p>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>

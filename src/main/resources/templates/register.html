@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Kayıt Ol</title>
+    <link rel="stylesheet" th:href="@{/css/auth.css}">
+</head>
+<body>
+
+<div class="auth-container">
+    <h2>Hesap Oluştur ✨</h2>
+
+    <div th:if="${error}" class="error-message" th:text="${error}"></div>
+
+    <form th:action="@{/register}" method="post">
+
+        <div class="form-group">
+            <input type="text" name="name" placeholder=" " required>
+            <label>Ad Soyad</label>
+        </div>
+
+        <div class="form-group">
+            <input type="email" name="email" placeholder=" " required>
+            <label>Email</label>
+        </div>
+
+        <div class="form-group">
+            <input type="password" name="password" placeholder=" " required>
+            <label>Şifre</label>
+        </div>
+
+        <button class="btn" type="submit">Kayıt Ol</button>
+    </form>
+
+    <div class="auth-footer">
+        Zaten hesabın var mı?
+        <a th:href="@{/login}">Giriş Yap</a>
+    </div>
+</div>
+
+</body>
+</html>

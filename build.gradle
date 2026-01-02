@@ -40,6 +40,7 @@ dependencies {
     testImplementation 'org.springframework.security:spring-security-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testImplementation 'com.h2database:h2'
+    testImplementation 'org.seleniumhq.selenium:selenium-java:4.23.0'
  }
 
 tasks.named('test') {
