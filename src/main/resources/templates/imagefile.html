@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Categories</title>
+    <title>Image Files</title>
     <link rel="stylesheet" th:href="@{/css/dashboard.css}">
 </head>
 <body>
@@ -10,10 +10,10 @@
     <div class="sidebar-header">Akıllı Ajanda</div>
     <div class="sidebar-menu">
         <a th:href="@{/dashboard}">Dashboard</a>
-        <a class="active">Categories</a>
+        <a th:href="@{/categories}">Categories</a>
         <a th:href="@{/events}">Events</a>
         <a th:href="@{/tasks}">Tasks</a>
-        <a th:href="@{/image-files}">Image Files</a>
+        <a class="active">Image Files</a>
         <a th:href="@{/notes}">Notes</a>
     </div>
 </div>
@@ -21,49 +21,44 @@
 <div class="main">
 
     <div class="topbar">
-        <div class="topbar-title">Categories</div>
+        <div class="topbar-title">Image Files</div>
         <a href="/logout" class="logout-btn">Logout</a>
     </div>
 
     <div class="content">
 
-        <!-- Add Category -->
+        <!-- Add Image -->
         <div class="card" style="margin-bottom:20px;">
-            <form th:action="@{/categories}" method="post" class="category-form">
-                <input type="text"
-                       name="name"
-                       placeholder="Yeni kategori adı"
+            <form th:action="@{/image-files/upload}" method="post" enctype="multipart/form-data" class="category-form">
+                <input type="file"
+                       name="file"
                        required>
                 <button type="submit" class="btn-add">Ekle</button>
             </form>
         </div>
 
-        <!-- Category List -->
+        <!-- Image List -->
         <div class="card">
             <table class="category-table">
                 <thead>
                 <tr>
-                    <th>Category Name</th>
+                    <th>Image</th>
+                    <th>Image Name</th>
                     <th style="text-align:right;">Actions</th>
                 </tr>
                 </thead>
                 <tbody>
 
-                <tr th:each="category : ${categories}">
+                <tr th:each="imageFile : ${imageFiles}">
                     <td>
-                        <form th:action="@{/categories/update/{id}(id=${category.id})}"
-                              method="post"
-                              class="category-form">
-                            <input type="text"
-                                   name="name"
-                                   th:value="${category.name}"
-                                   required>
-                            <button type="submit" class="btn-update">Güncelle</button>
-                        </form>
+                        <img th:src="@{${imageFile.filePath}}" alt="Image" width="100"/>
+                    </td>
+                    <td>
+                        <a th:href="@{/image-files/{id}(id=${imageFile.id})}" th:text="${imageFile.fileName}"></a>
                     </td>
 
                     <td class="category-actions">
-                        <form th:action="@{/categories/delete/{id}(id=${category.id})}"
+                        <form th:action="@{/image-files/delete/{id}(id=${imageFile.id})}"
                               method="post">
                             <button type="submit" class="btn-delete">Sil</button>
                         </form>

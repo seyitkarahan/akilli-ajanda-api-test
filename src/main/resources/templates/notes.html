@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Notes</title>
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+<body>
+
+<div class="sidebar">
+    <div class="sidebar-header">Akıllı Ajanda</div>
+    <div class="sidebar-menu">
+        <a th:href="@{/dashboard}">Dashboard</a>
+        <a th:href="@{/categories}">Categories</a>
+        <a th:href="@{/events}">Events</a>
+        <a th:href="@{/tasks}">Tasks</a>
+        <a th:href="@{/image-files}">Image Files</a>
+        <a class="active">Notes</a>
+    </div>
+</div>
+
+<div class="main">
+
+    <div class="topbar">
+        <div class="topbar-title">Notes</div>
+        <a href="/logout" class="logout-btn">Logout</a>
+    </div>
+
+    <div class="content">
+
+        <!-- Add Note -->
+        <div class="card" style="margin-bottom:20px;">
+            <form th:action="@{/notes}" method="post" th:object="${noteRequest}" class="category-form">
+                <input type="text" th:field="*{title}" placeholder="Title" required>
+                <textarea th:field="*{content}" placeholder="Content" required></textarea>
+                <input type="text" th:field="*{color}" placeholder="Color (e.g., #FFFFFF)">
+                <label>
+                    <input type="checkbox" th:field="*{pinned}"> Pin
+                </label>
+                <button type="submit" class="btn-add">Add Note</button>
+            </form>
+        </div>
+
+        <!-- Note List -->
+        <div class="card">
+            <table class="category-table">
+                <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Content</th>
+                    <th>Color</th>
+                    <th>Pinned</th>
+                    <th style="text-align:right;">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="note : ${notes}">
+                    <td th:text="${note.title}"></td>
+                    <td th:text="${note.content}"></td>
+                    <td th:text="${note.color}"></td>
+                    <td th:text="${note.isPinned()}"></td>
+                    <td class="category-actions">
+                        <form th:action="@{/notes/delete/{id}(id=${note.id})}" method="post">
+                            <button type="submit" class="btn-delete">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>
