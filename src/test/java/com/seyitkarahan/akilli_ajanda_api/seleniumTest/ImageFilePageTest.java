@@ -17,7 +17,6 @@ import java.io.File;
 import java.time.Duration;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -31,10 +30,12 @@ public class ImageFilePageTest {
     @BeforeEach
     public void setUp() {
         ChromeOptions options = new ChromeOptions();
-        // options.addArguments("--headless");
+        options.addArguments("--headless");
         options.addArguments("--disable-gpu");
         options.addArguments("--window-size=1920,1080");
         options.addArguments("--ignore-certificate-errors");
+        options.addArguments("--no-sandbox");
+        options.addArguments("--disable-dev-shm-usage");
 
         driver = new ChromeDriver(options);
     }
@@ -80,9 +81,12 @@ public class ImageFilePageTest {
         wait.until(ExpectedConditions.numberOfElementsToBe(
                 By.xpath("//table[@class='category-table']/tbody/tr"), rowsBeforeCount + 1));
 
-        // 4. Verify that the new row count is correct
-        List<WebElement> rowsAfter = driver.findElements(By.xpath("//table[@class='category-table']/tbody/tr"));
-        assertEquals(rowsBeforeCount + 1, rowsAfter.size(), "The number of rows should increase by 1.");
+        // 4. Now that the row exists, wait for the link inside it to be visible
+        WebElement newImageLink = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                By.xpath("//td/a[contains(text(), 'test-image')]")));
+
+        // 5. Assert that the link is displayed
+        assertTrue(newImageLink.isDisplayed(), "The uploaded image should be present in the table.");
     }
 
     @AfterEach
