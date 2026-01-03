@@ -1,22 +1,25 @@
 pipeline {
-    agent any
-
-    // tools {
-        // Jenkins'te "Global Tool Configuration" altında JDK 21'in kurulu ve adının 'jdk-21' olduğundan emin olun.
-        // Eğer farklı bir isim verdiyseniz burayı güncelleyin.
-        //jdk 'jdk-21'
-    // }
+    agent {
+        docker {
+            // JDK 21, Chrome ve ChromeDriver içeren hazır bir imaj kullanıyoruz
+            image 'sormuras/maven-google-chrome:jdk-21'
+            // Gradle cache'ini korumak için (isteğe bağlı, performansı artırır)
+            args '-v $HOME/.gradle:/root/.gradle'
+        }
+    }
 
     environment {
-        // Testlerin CI ortamında kararlı çalışması için bazı ayarlar
         CHROME_HEADLESS = 'true'
+        // Gradle'ın Docker içinde root olarak çalışmasına izin ver
+        GRADLE_USER_HOME = '/root/.gradle'
     }
 
     stages {
         stage('Build & Setup') {
             steps {
                 echo 'Building the application...'
-                // Testleri çalıştırmadan sadece projeyi derle
+                // Gradle wrapper'a çalıştırma izni ver
+                sh 'chmod +x ./gradlew'
                 sh './gradlew clean build -x test'
             }
         }
@@ -24,7 +27,6 @@ pipeline {
         stage('Test Scenario 1: Authentication') {
             steps {
                 echo 'Running Login and Registration tests...'
-                // "test" profilini aktif ederek H2 veritabanını kullan
                 sh './gradlew test -Dspring.profiles.active=test --tests "com.seyitkarahan.akilli_ajanda_api.seleniumTest.SeleniumIntegrationTest"'
             }
         }
@@ -32,7 +34,6 @@ pipeline {
         stage('Test Scenario 2: Core Features') {
             steps {
                 echo 'Running Category, Note, and Task tests...'
-                // "test" profilini aktif ederek H2 veritabanını kullan
                 sh './gradlew test -Dspring.profiles.active=test --tests "com.seyitkarahan.akilli_ajanda_api.seleniumTest.CategoryPageTest" --tests "com.seyitkarahan.akilli_ajanda_api.seleniumTest.NotePageTest" --tests "com.seyitkarahan.akilli_ajanda_api.seleniumTest.TaskPageTest"'
             }
         }
@@ -40,7 +41,6 @@ pipeline {
         stage('Test Scenario 3: Media & Events') {
             steps {
                 echo 'Running Image and Event tests...'
-                // "test" profilini aktif ederek H2 veritabanını kullan
                 sh './gradlew test -Dspring.profiles.active=test --tests "com.seyitkarahan.akilli_ajanda_api.seleniumTest.ImageFilePageTest" --tests "com.seyitkarahan.akilli_ajanda_api.seleniumTest.EventPageTest"'
             }
         }
@@ -49,7 +49,6 @@ pipeline {
     post {
         always {
             echo 'Archiving test results...'
-            // Test sonuçlarını Jenkins arayüzünde göster
             junit 'build/test-results/test/*.xml'
         }
         failure {
