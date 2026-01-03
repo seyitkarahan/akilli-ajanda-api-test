@@ -1,5 +1,9 @@
 pipeline {
-    agent any
+    agent {
+        dockerfile {
+            filename 'Dockerfile.test'
+        }
+    }
 
     environment {
         CHROME_HEADLESS = 'true'
