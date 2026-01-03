@@ -1,12 +1,6 @@
 pipeline {
     agent any
 
-    tools {
-        // Jenkins'te "Global Tool Configuration" altında JDK 21'in kurulu ve adının 'jdk-21' olduğundan emin olun.
-        // Eğer farklı bir isim verdiyseniz burayı güncelleyin.
-        jdk 'jdk-21'
-    }
-
     environment {
         // Testlerin CI ortamında kararlı çalışması için bazı ayarlar
         CHROME_HEADLESS = 'true'
