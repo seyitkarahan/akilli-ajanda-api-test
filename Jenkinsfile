@@ -1,24 +1,18 @@
 pipeline {
-    agent {
-        docker {
-            // JDK 21, Chrome ve ChromeDriver içeren hazır bir imaj kullanıyoruz
-            image 'sormuras/maven-google-chrome:jdk-21'
-            // Gradle cache'ini korumak için (isteğe bağlı, performansı artırır)
-            args '-v $HOME/.gradle:/root/.gradle'
-        }
+    agent any
+
+    tools {
+        jdk 'jdk-21'
     }
 
     environment {
         CHROME_HEADLESS = 'true'
-        // Gradle'ın Docker içinde root olarak çalışmasına izin ver
-        GRADLE_USER_HOME = '/root/.gradle'
     }
 
     stages {
         stage('Build & Setup') {
             steps {
                 echo 'Building the application...'
-                // Gradle wrapper'a çalıştırma izni ver
                 sh 'chmod +x ./gradlew'
                 sh './gradlew clean build -x test'
             }
