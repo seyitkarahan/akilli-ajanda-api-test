@@ -1,15 +1,48 @@
 pipeline {
-    agent {
-        dockerfile {
-            filename 'Dockerfile.test'
-        }
-    }
+    agent any
 
     environment {
         CHROME_HEADLESS = 'true'
     }
 
     stages {
+        stage('Setup Environment') {
+            steps {
+                script {
+                    echo "Checking for Google Chrome..."
+                    // Check if Chrome is installed
+                    def chromeLocation = sh(script: 'which google-chrome || which google-chrome-stable || echo "not_found"', returnStdout: true).trim()
+
+                    if (chromeLocation == 'not_found') {
+                        echo "Google Chrome not found. Attempting to install..."
+                        // Try to install Chrome (this might fail if not root, but it's worth a try or at least logging the need)
+                        try {
+                            sh '''
+                                if [ "$(id -u)" -eq 0 ]; then
+                                    apt-get update && apt-get install -y wget gnupg ca-certificates
+                                    wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | gpg --dearmor -o /usr/share/keyrings/google-chrome-keyring.gpg
+                                    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome-keyring.gpg] http://dl.google.com/linux/chrome/deb/ stable main" > /etc/apt/sources.list.d/google-chrome.list
+                                    apt-get update && apt-get install -y google-chrome-stable
+                                else
+                                    echo "----------------------------------------------------------------"
+                                    echo "WARNING: Chrome is missing and current user is not root."
+                                    echo "Please install 'Google Chrome' on the Jenkins server manually,"
+                                    echo "OR install the 'Docker Pipeline' and 'Docker' plugins in Jenkins"
+                                    echo "to allow running tests inside a container."
+                                    echo "----------------------------------------------------------------"
+                                fi
+                            '''
+                        } catch (Exception e) {
+                            echo "Failed to install Chrome: ${e.message}"
+                        }
+                    } else {
+                        echo "Google Chrome found at ${chromeLocation}"
+                        sh "${chromeLocation} --version"
+                    }
+                }
+            }
+        }
+
         stage('Build & Setup') {
             steps {
                 echo 'Building the application...'

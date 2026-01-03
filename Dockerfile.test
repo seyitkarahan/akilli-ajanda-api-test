@@ -12,3 +12,6 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 USER gradle
+WORKDIR /app
+COPY --chown=gradle:gradle . .
+RUN chmod +x ./gradlew
