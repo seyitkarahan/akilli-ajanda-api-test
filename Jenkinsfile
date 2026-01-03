@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    tools {
-        jdk 'jdk-21'
-    }
-
     environment {
         CHROME_HEADLESS = 'true'
     }
