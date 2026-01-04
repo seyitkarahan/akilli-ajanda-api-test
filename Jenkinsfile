@@ -42,7 +42,7 @@ pipeline {
                     }
         }
 
-        stage('5- Integration Tests') {
+        stage('5- Integration Test') {
             steps {
                 echo 'Running Integration Tests...'
                 sh './gradlew test --tests "*IntegrationTest"'
