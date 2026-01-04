@@ -40,7 +40,7 @@ pipeline {
                         sh 'docker compose up -d --build'
                         sh 'sleep 25'
                     }
-                }
+        }
 
         stage('5- Integration Tests') {
             steps {
