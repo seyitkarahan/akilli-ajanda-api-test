@@ -33,7 +33,6 @@ pipeline {
             }
         }
 
-        // docker
         stage('4- Start System with Docker') {
                     steps {
                         echo 'Starting system using Docker Compose...'
