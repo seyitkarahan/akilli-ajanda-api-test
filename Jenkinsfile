@@ -34,21 +34,6 @@ pipeline {
             }
         }
 
-        stage('3.5- Docker Sanity Check') {
-            steps {
-                echo 'Checking Docker availability in Jenkins...'
-                sh '''
-                whoami
-                groups
-                echo "PATH: $PATH"
-                which docker
-                docker --version
-                docker compose version
-                docker ps || true
-                '''
-            }
-        }
-
         stage('4- Start System with Docker') {
             steps {
                 echo 'Starting system using Docker Compose...'
