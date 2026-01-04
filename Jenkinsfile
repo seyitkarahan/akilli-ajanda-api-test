@@ -9,6 +9,7 @@ pipeline {
         CHROME_HEADLESS = 'true'
     }
 
+
     stages {
 
         stage('1- Checkout Source Code') {
