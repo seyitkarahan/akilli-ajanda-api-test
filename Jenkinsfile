@@ -36,8 +36,8 @@ pipeline {
         stage('4- Start System with Docker') {
                     steps {
                         echo 'Starting system using Docker Compose...'
-                        sh 'docker-compose down || true'
-                        sh 'docker-compose up -d --build'
+                        sh 'docker compose down || true'
+                        sh 'docker compose up -d --build'
                         sh 'sleep 25'
                     }
                 }
