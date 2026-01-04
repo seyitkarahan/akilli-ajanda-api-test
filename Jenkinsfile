@@ -33,19 +33,19 @@ pipeline {
             }
         }
 
-        stage('4- Integration Tests') {
+        stage('4- Start System with Docker') {
+                    steps {
+                        echo 'Starting system using Docker Compose...'
+                        sh 'docker-compose down || true'
+                        sh 'docker-compose up -d --build'
+                        sh 'sleep 25'
+                    }
+                }
+
+        stage('5- Integration Tests') {
             steps {
                 echo 'Running Integration Tests...'
                 sh './gradlew test --tests "*IntegrationTest"'
-            }
-        }
-
-        stage('5- Start System with Docker') {
-            steps {
-                echo 'Starting system using Docker Compose...'
-                sh 'docker-compose down || true'
-                sh 'docker-compose up -d --build'
-                sh 'sleep 25'
             }
         }
 
