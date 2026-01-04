@@ -29,6 +29,11 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND, "Category Not Found");
     }
 
+    @ExceptionHandler(CategoryAlreadyExistsException.class)
+    public ResponseEntity<Map<String, Object>> handleCategoryAlreadyExists(CategoryAlreadyExistsException ex) {
+        return buildErrorResponse(ex.getMessage(), HttpStatus.CONFLICT, "Category Already Exists");
+    }
+
     @ExceptionHandler(UnauthorizedActionException.class)
     public ResponseEntity<Map<String, Object>> handleUnauthorizedAction(UnauthorizedActionException ex) {
         return buildErrorResponse(ex.getMessage(), HttpStatus.FORBIDDEN, "Unauthorized Action");

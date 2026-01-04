@@ -4,6 +4,7 @@ import com.seyitkarahan.akilli_ajanda_api.dto.request.CategoryRequest;
 import com.seyitkarahan.akilli_ajanda_api.dto.response.CategoryResponse;
 import com.seyitkarahan.akilli_ajanda_api.entity.Category;
 import com.seyitkarahan.akilli_ajanda_api.entity.User;
+import com.seyitkarahan.akilli_ajanda_api.exception.CategoryAlreadyExistsException;
 import com.seyitkarahan.akilli_ajanda_api.exception.CategoryNotFoundException;
 import com.seyitkarahan.akilli_ajanda_api.exception.UnauthorizedActionException;
 import com.seyitkarahan.akilli_ajanda_api.exception.UserNotFoundException;
@@ -36,6 +37,11 @@ public class CategoryService {
 
     public CategoryResponse createCategory(CategoryRequest request) {
         User user = getCurrentUser();
+        
+        if (categoryRepository.existsByNameAndUser(request.getName(), user)) {
+            throw new CategoryAlreadyExistsException("Bu isimde bir kategori zaten mevcut!");
+        }
+
         Category category = Category.builder()
                 .name(request.getName())
                 .user(user)
@@ -51,6 +57,10 @@ public class CategoryService {
 
         if (!category.getUser().getId().equals(user.getId())) {
             throw new UnauthorizedActionException("Bu kategoriyi güncelleme iznin yok!");
+        }
+
+        if (categoryRepository.existsByNameAndUser(request.getName(), user) && !category.getName().equals(request.getName())) {
+            throw new CategoryAlreadyExistsException("Bu isimde bir kategori zaten mevcut!");
         }
 
         category.setName(request.getName());

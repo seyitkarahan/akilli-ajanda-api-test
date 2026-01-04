@@ -2,6 +2,7 @@ package com.seyitkarahan.akilli_ajanda_api.config;
 
 import com.seyitkarahan.akilli_ajanda_api.filter.JwtAuthenticationFilter;
 import com.seyitkarahan.akilli_ajanda_api.security.CustomUserDetailsService;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -47,6 +48,11 @@ public class SecurityConfig {
                                 "/js/**",
                                 "/images/**").permitAll()
                         .anyRequest().authenticated()
+                )
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+                        })
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
