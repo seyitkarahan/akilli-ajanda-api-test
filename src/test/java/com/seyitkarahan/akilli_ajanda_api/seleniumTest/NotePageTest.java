@@ -1,5 +1,7 @@
 package com.seyitkarahan.akilli_ajanda_api.seleniumTest;
 
+import com.seyitkarahan.akilli_ajanda_api.dto.request.AuthRequest;
+import com.seyitkarahan.akilli_ajanda_api.service.AuthService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,6 +12,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
@@ -27,6 +30,9 @@ public class NotePageTest {
     @LocalServerPort
     private int port;
 
+    @Autowired
+    private AuthService authService;
+
     @BeforeEach
     public void setUp() {
         ChromeOptions options = new ChromeOptions();
@@ -42,6 +48,17 @@ public class NotePageTest {
     }
 
     private void login() {
+        // Ensure the user exists before trying to login
+        try {
+            AuthRequest registerRequest = new AuthRequest();
+            registerRequest.setName("Test User");
+            registerRequest.setEmail("deneme@gmail.com");
+            registerRequest.setPassword("1234");
+            authService.register(registerRequest);
+        } catch (Exception e) {
+            // User might already exist, which is fine
+        }
+
         driver.get("http://localhost:" + port + "/login");
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         wait.until(ExpectedConditions.titleIs("Giriş Yap"));
