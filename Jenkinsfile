@@ -87,6 +87,7 @@ pipeline {
         always {
             echo 'Archiving test reports...'
             junit 'build/test-results/test/*.xml'
+            sh 'docker compose down || true'
         }
         success {
             echo 'Pipeline completed successfully!'
