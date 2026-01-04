@@ -7,7 +7,7 @@ pipeline {
 
     environment {
         CHROME_HEADLESS = 'true'
-        PATH = "/opt/homebrew/bin:$PATH" // MacOS Homebrew için PATH
+        PATH = "/usr/local/bin:/opt/homebrew/bin:/Applications/Docker.app/Contents/Resources/bin:${env.PATH}"
     }
 
     stages {
