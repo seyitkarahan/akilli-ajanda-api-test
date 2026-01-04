@@ -11,7 +11,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "ecurring_task_rules")
+@Table(name = "recurring_task_rules")
 public class RecurringTaskRule {
 
     @Id
