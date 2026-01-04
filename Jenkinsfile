@@ -2,13 +2,13 @@ pipeline {
     agent any
 
     triggers {
-            githubPush()
+        githubPush()
     }
 
     environment {
         CHROME_HEADLESS = 'true'
+        PATH = "/opt/homebrew/bin:$PATH" // MacOS Homebrew için PATH
     }
-
 
     stages {
 
@@ -37,22 +37,27 @@ pipeline {
         stage('3.5- Docker Sanity Check') {
             steps {
                 echo 'Checking Docker availability in Jenkins...'
-                sh 'whoami'
-                sh 'groups'
-                sh 'docker --version'
-                sh 'docker-compose --version'
-                sh 'docker ps'
+                sh '''
+                whoami
+                groups
+                echo "PATH: $PATH"
+                which docker
+                docker --version
+                docker compose version
+                docker ps || true
+                '''
             }
         }
 
-
         stage('4- Start System with Docker') {
-                    steps {
-                        echo 'Starting system using Docker Compose...'
-                        sh 'docker-compose down || true'
-                        sh 'docker-compose up -d --build'
-                        sh 'sleep 25'
-                    }
+            steps {
+                echo 'Starting system using Docker Compose...'
+                sh '''
+                docker compose down || true
+                docker compose up -d --build
+                sleep 25
+                '''
+            }
         }
 
         stage('5- Integration Tests') {
@@ -106,4 +111,3 @@ pipeline {
         }
     }
 }
-
