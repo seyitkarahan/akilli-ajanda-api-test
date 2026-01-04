@@ -18,6 +18,8 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
 
@@ -78,7 +80,7 @@ public class ImageFilePageTest {
     }
 
     @Test
-    public void testUploadImage() {
+    public void testUploadImage() throws IOException {
         login();
 
         driver.get("http://localhost:" + port + "/image-files");
@@ -89,8 +91,13 @@ public class ImageFilePageTest {
         List<WebElement> rowsBefore = driver.findElements(By.xpath("//table[@class='category-table']/tbody/tr"));
         int rowsBeforeCount = rowsBefore.size();
 
-        // 2. Upload the file
-        File testFile = new File("src/test/resources/test-image.txt");
+        // 2. Create a temporary file for testing
+        File testFile = File.createTempFile("test-image", ".txt");
+        try (FileWriter writer = new FileWriter(testFile)) {
+            writer.write("This is a test file content.");
+        }
+        testFile.deleteOnExit();
+
         WebElement fileInput = driver.findElement(By.xpath("//input[@type='file']"));
         fileInput.sendKeys(testFile.getAbsolutePath());
 
@@ -102,15 +109,6 @@ public class ImageFilePageTest {
                 By.xpath("//table[@class='category-table']/tbody/tr"), rowsBeforeCount));
 
         // 4. Now that the row exists, wait for the link inside it to be visible
-        // Note: The file name on the server will be a UUID, so we can't search for "test-image" in the link text directly
-        // unless the UI displays the original filename or we check for the presence of ANY new link.
-        // However, looking at ImageService, it saves the file with a UUID name, but the ImageResponse returns that UUID name.
-        // The UI displays `imageFile.fileName`.
-        // Since the original filename is lost and replaced by a UUID, we should check if a new row appeared.
-        
-        // Let's just verify that we have more rows than before, which we already did.
-        // To be more specific, we can check if the last row contains a link.
-        
         List<WebElement> rowsAfter = driver.findElements(By.xpath("//table[@class='category-table']/tbody/tr"));
         WebElement lastRow = rowsAfter.get(rowsAfter.size() - 1);
         WebElement link = lastRow.findElement(By.tagName("a"));
