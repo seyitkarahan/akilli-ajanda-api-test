@@ -33,6 +33,18 @@ pipeline {
             }
         }
 
+        stage('3.5- Docker Sanity Check') {
+            steps {
+                echo 'Checking Docker availability in Jenkins...'
+                sh 'whoami'
+                sh 'groups'
+                sh 'docker --version'
+                sh 'docker-compose --version'
+                sh 'docker ps'
+            }
+        }
+
+
         stage('4- Start System with Docker') {
                     steps {
                         echo 'Starting system using Docker Compose...'
