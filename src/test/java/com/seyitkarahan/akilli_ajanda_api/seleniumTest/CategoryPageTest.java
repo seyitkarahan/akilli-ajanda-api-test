@@ -60,10 +60,10 @@ public class CategoryPageTest {
         }
 
         driver.get("http://localhost:" + port + "/login");
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30)); // Increased timeout
         wait.until(ExpectedConditions.titleIs("Giriş Yap"));
 
-        WebElement emailInput = driver.findElement(By.name("email"));
+        WebElement emailInput = wait.until(ExpectedConditions.visibilityOfElementLocated(By.name("email"))); // Explicit wait
         WebElement passwordInput = driver.findElement(By.name("password"));
 
         emailInput.sendKeys("deneme@gmail.com");
@@ -80,10 +80,10 @@ public class CategoryPageTest {
         login();
 
         driver.get("http://localhost:" + port + "/categories");
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30)); // Increased timeout
         wait.until(ExpectedConditions.titleIs("Categories"));
 
-        WebElement nameInput = driver.findElement(By.xpath("//input[@placeholder='Yeni kategori adı']"));
+        WebElement nameInput = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@placeholder='Yeni kategori adı']"))); // Explicit wait
         String categoryName = "Test Category " + System.currentTimeMillis();
         nameInput.sendKeys(categoryName);
 

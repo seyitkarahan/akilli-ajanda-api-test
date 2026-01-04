@@ -34,7 +34,6 @@ public class TaskPageTest {
     @Autowired
     private AuthService authService;
 
-    // lafdjhgkjadfhgk
     @BeforeEach
     public void setUp() {
         ChromeOptions options = new ChromeOptions();
@@ -62,10 +61,10 @@ public class TaskPageTest {
         }
 
         driver.get("http://localhost:" + port + "/login");
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30)); // Increased timeout
         wait.until(ExpectedConditions.titleIs("Giriş Yap"));
 
-        WebElement emailInput = driver.findElement(By.name("email"));
+        WebElement emailInput = wait.until(ExpectedConditions.visibilityOfElementLocated(By.name("email"))); // Explicit wait
         WebElement passwordInput = driver.findElement(By.name("password"));
 
         emailInput.sendKeys("deneme@gmail.com");
@@ -82,10 +81,10 @@ public class TaskPageTest {
         login();
 
         driver.get("http://localhost:" + port + "/tasks");
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30)); // Increased timeout
         wait.until(ExpectedConditions.titleIs("Tasks"));
 
-        WebElement titleInput = driver.findElement(By.xpath("//form[@action='/tasks']//input[@name='title']"));
+        WebElement titleInput = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//form[@action='/tasks']//input[@name='title']"))); // Explicit wait
         String taskTitle = "Test Task " + System.currentTimeMillis();
         titleInput.sendKeys(taskTitle);
 

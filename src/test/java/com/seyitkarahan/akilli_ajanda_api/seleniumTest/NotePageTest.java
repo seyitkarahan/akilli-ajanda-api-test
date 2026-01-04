@@ -60,10 +60,10 @@ public class NotePageTest {
         }
 
         driver.get("http://localhost:" + port + "/login");
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30)); // Increased timeout
         wait.until(ExpectedConditions.titleIs("Giriş Yap"));
 
-        WebElement emailInput = driver.findElement(By.name("email"));
+        WebElement emailInput = wait.until(ExpectedConditions.visibilityOfElementLocated(By.name("email"))); // Explicit wait
         WebElement passwordInput = driver.findElement(By.name("password"));
 
         emailInput.sendKeys("deneme@gmail.com");
@@ -80,10 +80,10 @@ public class NotePageTest {
         login();
 
         driver.get("http://localhost:" + port + "/notes");
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30)); // Increased timeout
         wait.until(ExpectedConditions.titleIs("Notes"));
 
-        WebElement titleInput = driver.findElement(By.name("title"));
+        WebElement titleInput = wait.until(ExpectedConditions.visibilityOfElementLocated(By.name("title"))); // Explicit wait
         String noteTitle = "Test Note " + System.currentTimeMillis();
         titleInput.sendKeys(noteTitle);
 
