@@ -37,7 +37,7 @@ pipeline {
             steps {
                 echo 'Running Unit Tests...'
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    sh './gradlew test --tests "*ServiceTest"'
+                    sh './gradlew test --tests "com.seyitkarahan.akilli_ajanda_api.service.*"'
                 }
             }
             post {
@@ -51,7 +51,7 @@ pipeline {
             steps {
                 echo 'Running Integration Tests...'
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    sh './gradlew test --tests "*IntegrationTest"'
+                    sh './gradlew test --tests "com.seyitkarahan.akilli_ajanda_api.integration.*"'
                 }
             }
             post {
@@ -70,17 +70,9 @@ pipeline {
 
                     echo "Waiting for backend to be ready..."
                     for i in {1..60}; do
-                        if curl -sf http://localhost:8080/actuator/health; then
+                        # Check for the Swagger UI endpoint as a health check
+                        if curl -sf http://localhost:8081/swagger-ui/index.html; then
                             echo "Backend is ready!"
-                            break
-                        fi
-                        sleep 2
-                    done
-
-                    echo "Waiting for frontend to be ready..."
-                    for i in {1..60}; do
-                        if curl -sf http://localhost:3000/login; then
-                            echo "Frontend is ready!"
                             break
                         fi
                         sleep 2
