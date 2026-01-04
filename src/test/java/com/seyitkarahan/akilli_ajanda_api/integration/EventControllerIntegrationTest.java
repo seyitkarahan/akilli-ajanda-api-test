@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -63,8 +64,8 @@ class EventControllerIntegrationTest {
 
         token = objectMapper.readTree(loginResponse).get("token").asText();
 
-        // category oluştur
-        String categoryResponse = mockMvc.perform(post("/api/categories")
+        // category oluştur veya mevcut olanı al
+        MvcResult categoryResult = mockMvc.perform(post("/api/categories")
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -72,12 +73,41 @@ class EventControllerIntegrationTest {
                                   "name": "Event Category"
                                 }
                                 """))
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
+                .andReturn();
 
-        categoryId = objectMapper.readTree(categoryResponse).get("id").asLong();
+        if (categoryResult.getResponse().getStatus() == 200) {
+            categoryId = objectMapper.readTree(categoryResult.getResponse().getContentAsString()).get("id").asLong();
+        } else if (categoryResult.getResponse().getStatus() == 409) {
+            // Kategori zaten varsa, mevcut kategorileri listele ve "Event Category" ismini bul
+            String categoriesResponse = mockMvc.perform(get("/api/categories")
+                            .header("Authorization", "Bearer " + token))
+                    .andExpect(status().isOk())
+                    .andReturn()
+                    .getResponse()
+                    .getContentAsString();
+            
+            categoryId = objectMapper.readTree(categoriesResponse).findValues("name").stream()
+                    .filter(node -> node.asText().equals("Event Category"))
+                    .findFirst()
+                    .map(node -> {
+                        try {
+                            // Bu kısım biraz karmaşık olabilir, JSON yapısına göre id'yi bulmak gerekebilir.
+                            // Basitçe tüm listeyi tarayıp id'yi bulalım.
+                            var categories = objectMapper.readTree(categoriesResponse);
+                            for (var cat : categories) {
+                                if (cat.get("name").asText().equals("Event Category")) {
+                                    return cat.get("id").asLong();
+                                }
+                            }
+                            return null;
+                        } catch (Exception e) {
+                            return null;
+                        }
+                    })
+                    .orElseThrow(() -> new RuntimeException("Category not found"));
+        } else {
+            throw new RuntimeException("Failed to create or retrieve category");
+        }
     }
 
     @Test
