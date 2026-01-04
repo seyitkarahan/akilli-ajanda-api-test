@@ -70,12 +70,13 @@ pipeline {
 
                     echo "Waiting for backend to be ready..."
                     for i in {1..60}; do
-                        # Check for the Swagger UI endpoint as a health check
-                        if curl -sf http://localhost:8081/swagger-ui/index.html; then
+                        # Use curl with retry and timeout for a more reliable health check
+                        if curl --retry 5 --retry-delay 2 --connect-timeout 5 -sf http://localhost:8081/swagger-ui/index.html; then
                             echo "Backend is ready!"
                             break
                         fi
-                        sleep 2
+                        echo "Backend not ready yet. Retrying..."
+                        sleep 5
                     done
                 '''
             }
@@ -141,6 +142,9 @@ pipeline {
             }
             post {
                 always {
+                    // The publishHTML step is commented out because the HTML Publisher plugin is not installed in your Jenkins.
+                    // To enable this, ask your Jenkins administrator to install the "HTML Publisher" plugin.
+                    /*
                     publishHTML([
                         reportName: 'JaCoCo Coverage Report',
                         reportDir: 'build/reports/jacoco/test/html',
@@ -148,6 +152,7 @@ pipeline {
                         keepAll: true,
                         alwaysLinkToLastBuild: true
                     ])
+                    */
                 }
             }
         }
