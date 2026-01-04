@@ -148,7 +148,7 @@ pipeline {
                     /*
                     publishHTML([
                         reportName: 'JaCoCo Coverage Report',
-                        reportDir: 'build/reports/jacoco/test/html',
+                        reportDir: 'build/reports/jacoco/test/html',sssss
                         reportFiles: 'index.html',
                         keepAll: true,
                         alwaysLinkToLastBuild: true
