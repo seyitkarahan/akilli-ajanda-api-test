@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    triggers {
+            githubPush()
+    }
+
     environment {
         CHROME_HEADLESS = 'true'
     }
