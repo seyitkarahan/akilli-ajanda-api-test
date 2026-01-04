@@ -33,7 +33,6 @@ pipeline {
             }
         }
 
-        // silinecek
         stage('3.5- Docker Sanity Check') {
             steps {
                 echo 'Checking Docker availability in Jenkins...'
