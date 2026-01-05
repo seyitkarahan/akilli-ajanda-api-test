@@ -5,6 +5,7 @@ pipeline {
         githubPush()
     }
 
+
     environment {
         CHROME_HEADLESS = 'true'
         PATH = "/usr/local/bin:/opt/homebrew/bin:/Applications/Docker.app/Contents/Resources/bin:${env.PATH}"
