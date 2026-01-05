@@ -80,21 +80,36 @@ public class CategoryPageTest {
         login();
 
         driver.get("http://localhost:" + port + "/categories");
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30)); // Increased timeout
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
+
         wait.until(ExpectedConditions.titleIs("Categories"));
 
-        WebElement nameInput = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@placeholder='Yeni kategori adı']"))); // Explicit wait
+        WebElement nameInput = wait.until(
+                ExpectedConditions.visibilityOfElementLocated(
+                        By.cssSelector("input[type='text']")
+                )
+        );
+
         String categoryName = "Test Category " + System.currentTimeMillis();
         nameInput.sendKeys(categoryName);
 
-        WebElement addButton = driver.findElement(By.className("btn-add"));
+        WebElement addButton = wait.until(
+                ExpectedConditions.elementToBeClickable(
+                        By.cssSelector("button[type='submit']")
+                )
+        );
         addButton.click();
 
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@value='" + categoryName + "']")));
+        WebElement createdCategory = wait.until(
+                ExpectedConditions.visibilityOfElementLocated(
+                        By.xpath("//input[contains(@value,'" + categoryName + "')]")
+                )
+        );
 
-        boolean isCategoryPresent = !driver.findElements(By.xpath("//input[@value='" + categoryName + "']")).isEmpty();
-        assertTrue(isCategoryPresent, "The new category should be present in the table.");
+        assertTrue(createdCategory.isDisplayed(),
+                "The new category should be visible on the page.");
     }
+
 
     @AfterEach
     public void tearDown() {

@@ -80,10 +80,14 @@ public class NotePageTest {
         login();
 
         driver.get("http://localhost:" + port + "/notes");
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30)); // Increased timeout
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
+
         wait.until(ExpectedConditions.titleIs("Notes"));
 
-        WebElement titleInput = wait.until(ExpectedConditions.visibilityOfElementLocated(By.name("title"))); // Explicit wait
+        WebElement titleInput = wait.until(
+                ExpectedConditions.visibilityOfElementLocated(By.name("title"))
+        );
+
         String noteTitle = "Test Note " + System.currentTimeMillis();
         titleInput.sendKeys(noteTitle);
 
@@ -93,16 +97,23 @@ public class NotePageTest {
         WebElement colorInput = driver.findElement(By.name("color"));
         colorInput.sendKeys("#FF0000");
 
-        WebElement addButton = driver.findElement(By.className("btn-add"));
+        WebElement addButton = wait.until(
+                ExpectedConditions.elementToBeClickable(
+                        By.cssSelector("button[type='submit']")
+                )
+        );
         addButton.click();
 
-        wait.until(ExpectedConditions.titleIs("Notes"));
+        WebElement createdNote = wait.until(
+                ExpectedConditions.visibilityOfElementLocated(
+                        By.xpath("//td[contains(text(),'" + noteTitle + "')]")
+                )
+        );
 
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//td[text()='" + noteTitle + "']")));
-
-        boolean isNotePresent = !driver.findElements(By.xpath("//td[text()='" + noteTitle + "']")).isEmpty();
-        assertTrue(isNotePresent, "The new note should be present in the table.");
+        assertTrue(createdNote.isDisplayed(),
+                "The new note should be visible in the table.");
     }
+
 
     @AfterEach
     public void tearDown() {

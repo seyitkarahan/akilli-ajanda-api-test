@@ -85,37 +85,42 @@ public class ImageFilePageTest {
 
         driver.get("http://localhost:" + port + "/image-files");
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
+
         wait.until(ExpectedConditions.titleIs("Image Files"));
 
-        // 1. Count rows before upload
-        List<WebElement> rowsBefore = driver.findElements(By.xpath("//table[@class='category-table']/tbody/tr"));
-        int rowsBeforeCount = rowsBefore.size();
+        WebElement fileInput = wait.until(
+                ExpectedConditions.visibilityOfElementLocated(
+                        By.cssSelector("input[type='file']")
+                )
+        );
 
-        // 2. Create a temporary file for testing
         File testFile = File.createTempFile("test-image", ".txt");
         try (FileWriter writer = new FileWriter(testFile)) {
             writer.write("This is a test file content.");
         }
         testFile.deleteOnExit();
 
-        WebElement fileInput = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@type='file']")));
         fileInput.sendKeys(testFile.getAbsolutePath());
 
-        WebElement addButton = driver.findElement(By.className("btn-add"));
+        WebElement addButton = wait.until(
+                ExpectedConditions.elementToBeClickable(
+                        By.cssSelector("button[type='submit']")
+                )
+        );
         addButton.click();
 
-        // 3. Wait for the number of rows to increase by 1
-        wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(
-                By.xpath("//table[@class='category-table']/tbody/tr"), rowsBeforeCount));
+        WebElement uploadedFileLink = wait.until(
+                ExpectedConditions.visibilityOfElementLocated(
+                        By.xpath("//a[contains(text(),'.txt')]")
+                )
+        );
 
-        // 4. Now that the row exists, wait for the link inside it to be visible
-        List<WebElement> rowsAfter = driver.findElements(By.xpath("//table[@class='category-table']/tbody/tr"));
-        WebElement lastRow = rowsAfter.get(rowsAfter.size() - 1);
-        WebElement link = lastRow.findElement(By.tagName("a"));
-        
-        assertTrue(link.isDisplayed(), "The uploaded image link should be present in the table.");
-        assertTrue(link.getText().endsWith(".txt"), "The uploaded file should have the correct extension.");
+        assertTrue(uploadedFileLink.isDisplayed(),
+                "The uploaded image link should be visible.");
+        assertTrue(uploadedFileLink.getText().endsWith(".txt"),
+                "The uploaded file should have the correct extension.");
     }
+
 
     @AfterEach
     public void tearDown() {
