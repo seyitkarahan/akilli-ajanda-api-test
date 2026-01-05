@@ -9,7 +9,6 @@ pipeline {
     environment {
         CHROME_HEADLESS = 'true'
         PATH = "/usr/local/bin:/opt/homebrew/bin:/Applications/Docker.app/Contents/Resources/bin:${env.PATH}"
-        JAVA_TOOL_OPTIONS = "-Dwebdriver.chrome.driver=/usr/local/bin/chromedriver"
     }
 
     options {
