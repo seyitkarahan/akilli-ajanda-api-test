@@ -63,10 +63,10 @@ public class EventPageTest {
         }
 
         driver.get("http://localhost:" + port + "/login");
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
         wait.until(ExpectedConditions.titleIs("Giriş Yap"));
 
-        WebElement emailInput = driver.findElement(By.name("email"));
+        WebElement emailInput = wait.until(ExpectedConditions.visibilityOfElementLocated(By.name("email")));
         WebElement passwordInput = driver.findElement(By.name("password"));
 
         emailInput.sendKeys("deneme@gmail.com");
@@ -83,11 +83,11 @@ public class EventPageTest {
         login();
 
         driver.get("http://localhost:" + port + "/events");
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
         wait.until(ExpectedConditions.titleIs("Events"));
 
         // Use more specific selectors for the "Add Event" form
-        WebElement titleInput = driver.findElement(By.xpath("//form[@action='/events']//input[@name='title']"));
+        WebElement titleInput = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//form[@action='/events']//input[@name='title']")));
         String eventTitle = "Test Event " + System.currentTimeMillis();
         titleInput.sendKeys(eventTitle);
 

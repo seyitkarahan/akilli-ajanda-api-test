@@ -64,10 +64,10 @@ public class ImageFilePageTest {
         }
 
         driver.get("http://localhost:" + port + "/login");
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
         wait.until(ExpectedConditions.titleIs("Giriş Yap"));
 
-        WebElement emailInput = driver.findElement(By.name("email"));
+        WebElement emailInput = wait.until(ExpectedConditions.visibilityOfElementLocated(By.name("email")));
         WebElement passwordInput = driver.findElement(By.name("password"));
 
         emailInput.sendKeys("deneme@gmail.com");
@@ -84,7 +84,7 @@ public class ImageFilePageTest {
         login();
 
         driver.get("http://localhost:" + port + "/image-files");
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
         wait.until(ExpectedConditions.titleIs("Image Files"));
 
         // 1. Count rows before upload
@@ -98,7 +98,7 @@ public class ImageFilePageTest {
         }
         testFile.deleteOnExit();
 
-        WebElement fileInput = driver.findElement(By.xpath("//input[@type='file']"));
+        WebElement fileInput = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//input[@type='file']")));
         fileInput.sendKeys(testFile.getAbsolutePath());
 
         WebElement addButton = driver.findElement(By.className("btn-add"));

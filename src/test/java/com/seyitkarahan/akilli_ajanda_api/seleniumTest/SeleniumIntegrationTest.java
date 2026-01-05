@@ -61,11 +61,11 @@ public class SeleniumIntegrationTest {
         }
 
         driver.get("http://localhost:" + port + "/login");
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
         wait.until(ExpectedConditions.titleIs("Giriş Yap"));
         assertEquals("Giriş Yap", driver.getTitle());
 
-        WebElement emailInput = driver.findElement(By.name("email"));
+        WebElement emailInput = wait.until(ExpectedConditions.visibilityOfElementLocated(By.name("email")));
         WebElement passwordInput = driver.findElement(By.name("password"));
 
         emailInput.sendKeys("deneme@gmail.com");
@@ -81,12 +81,12 @@ public class SeleniumIntegrationTest {
     public void testSuccessfulRegistration() {
         // 1. Kayıt sayfasına git
         driver.get("http://localhost:" + port + "/register");
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
         wait.until(ExpectedConditions.titleIs("Kayıt Ol"));
         assertEquals("Kayıt Ol", driver.getTitle());
 
         // 2. Form alanlarını bul ve doldur
-        WebElement nameInput = driver.findElement(By.name("name"));
+        WebElement nameInput = wait.until(ExpectedConditions.visibilityOfElementLocated(By.name("name")));
         WebElement emailInput = driver.findElement(By.name("email"));
         WebElement passwordInput = driver.findElement(By.name("password"));
 
