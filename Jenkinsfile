@@ -176,14 +176,6 @@ pipeline {
             post {
                 always {
                     echo 'HTML Publisher plugin is not installed. Skipping HTML report publishing.'
-                    publishHTML([
-                        reportName: 'JaCoCo Coverage Report',
-                        reportDir: 'build/reports/jacoco/test/html',
-                        reportFiles: 'index.html',
-                        keepAll: true,
-                        alwaysLinkToLastBuild: true
-                    ])
-
                 }
             }
         }
