@@ -175,7 +175,8 @@ pipeline {
             }
             post {
                 always {
-                    echo 'HTML Publisher plugin is not installed. Skipping HTML report publishing.'
+                    echo 'Archiving JaCoCo Coverage Report...'
+                    archiveArtifacts artifacts: 'build/reports/jacoco/test/html/**/*', allowEmptyArchive: true
                 }
             }
         }
