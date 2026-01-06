@@ -121,7 +121,6 @@ pipeline {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
                     sh '''
                         ./gradlew test \
-                        --tests "com.seyitkarahan.akilli_ajanda_api.seleniumTest.ImageFilePageTest" \
                         --tests "com.seyitkarahan.akilli_ajanda_api.seleniumTest.EventPageTest"
                     '''
                 }

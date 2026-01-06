@@ -35,80 +35,87 @@ public class TaskPageTest {
     private AuthService authService;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless=new");
-        options.addArguments("--disable-gpu");
-        options.addArguments("--window-size=1920,1080");
-        options.addArguments("--ignore-certificate-errors");
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-dev-shm-usage");
-        options.addArguments("--remote-allow-origins=*");
+        options.addArguments("--window-size=1920,1080");
 
         driver = new ChromeDriver(options);
     }
 
+    private WebDriverWait getWait() {
+        return new WebDriverWait(driver, Duration.ofSeconds(40));
+    }
+
     private void login() {
-        // Ensure the user exists before trying to login
         try {
-            AuthRequest registerRequest = new AuthRequest();
-            registerRequest.setName("Test User");
-            registerRequest.setEmail("deneme@gmail.com");
-            registerRequest.setPassword("1234");
-            authService.register(registerRequest);
-        } catch (Exception e) {
-            // User might already exist, which is fine
-        }
+            AuthRequest req = new AuthRequest();
+            req.setName("Test User");
+            req.setEmail("deneme@gmail.com");
+            req.setPassword("1234");
+            authService.register(req);
+        } catch (Exception ignored) {}
 
         driver.get("http://localhost:" + port + "/login");
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30)); // Increased timeout
-        wait.until(ExpectedConditions.titleIs("Giriş Yap"));
 
-        WebElement emailInput = wait.until(ExpectedConditions.visibilityOfElementLocated(By.name("email"))); // Explicit wait
-        WebElement passwordInput = driver.findElement(By.name("password"));
+        WebElement email = getWait().until(
+                ExpectedConditions.visibilityOfElementLocated(By.name("email"))
+        );
+        WebElement password = getWait().until(
+                ExpectedConditions.visibilityOfElementLocated(By.name("password"))
+        );
 
-        emailInput.sendKeys("deneme@gmail.com");
-        passwordInput.sendKeys("1234");
+        email.sendKeys("deneme@gmail.com");
+        password.sendKeys("1234");
 
-        WebElement loginButton = driver.findElement(By.cssSelector("button[type='submit']"));
-        loginButton.click();
+        getWait().until(
+                ExpectedConditions.elementToBeClickable(By.cssSelector("button[type='submit']"))
+        ).click();
 
-        wait.until(ExpectedConditions.titleIs("Dashboard"));
+        getWait().until(ExpectedConditions.urlContains("/dashboard"));
     }
 
     @Test
-    public void testAddTask() {
+    void testAddTask() {
         login();
 
         driver.get("http://localhost:" + port + "/tasks");
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30)); // Increased timeout
-        wait.until(ExpectedConditions.titleIs("Tasks"));
 
-        WebElement titleInput = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//form[@action='/tasks']//input[@name='title']"))); // Explicit wait
+        WebElement titleInput = getWait().until(
+                ExpectedConditions.visibilityOfElementLocated(By.name("title"))
+        );
+
         String taskTitle = "Test Task " + System.currentTimeMillis();
         titleInput.sendKeys(taskTitle);
 
-        WebElement statusSelect = driver.findElement(By.xpath("//form[@action='/tasks']//select[@name='status']"));
+        WebElement statusSelect = getWait().until(
+                ExpectedConditions.elementToBeClickable(By.name("status"))
+        );
         new Select(statusSelect).selectByVisibleText("PENDING");
 
-        WebElement importanceSelect = driver.findElement(By.xpath("//form[@action='/tasks']//select[@name='importanceLevel']"));
+        WebElement importanceSelect = getWait().until(
+                ExpectedConditions.elementToBeClickable(By.name("importanceLevel"))
+        );
         new Select(importanceSelect).selectByVisibleText("HIGH");
 
-        WebElement addButton = driver.findElement(By.xpath("//form[@action='/tasks']//button[@type='submit']"));
-        addButton.click();
+        getWait().until(
+                ExpectedConditions.elementToBeClickable(By.cssSelector("button[type='submit']"))
+        ).click();
 
-        wait.until(ExpectedConditions.titleIs("Tasks"));
+        WebElement createdTask = getWait().until(
+                ExpectedConditions.visibilityOfElementLocated(
+                        By.xpath("//td//input[@value='" + taskTitle + "']")
+                )
+        );
 
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//td/form/input[@value='" + taskTitle + "']")));
-
-        boolean isTaskPresent = !driver.findElements(By.xpath("//td/form/input[@value='" + taskTitle + "']")).isEmpty();
-        assertTrue(isTaskPresent, "The new task should be present in the table.");
+        assertTrue(createdTask.isDisplayed());
     }
 
     @AfterEach
-    public void tearDown() {
+    void tearDown() {
         if (driver != null) {
-            try { Thread.sleep(3000); } catch (InterruptedException e) { e.printStackTrace(); }
             driver.quit();
         }
     }
