@@ -176,9 +176,6 @@ pipeline {
             post {
                 always {
                     echo 'HTML Publisher plugin is not installed. Skipping HTML report publishing.'
-                    // The publishHTML step is commented out because the HTML Publisher plugin is not installed in your Jenkins.
-                    // To enable this, ask your Jenkins administrator to install the "HTML Publisher" plugin.
-                    /*
                     publishHTML([
                         reportName: 'JaCoCo Coverage Report',
                         reportDir: 'build/reports/jacoco/test/html',
@@ -186,7 +183,7 @@ pipeline {
                         keepAll: true,
                         alwaysLinkToLastBuild: true
                     ])
-                    */
+
                 }
             }
         }
