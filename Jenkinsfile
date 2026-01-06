@@ -96,16 +96,11 @@ pipeline {
             }
         }
 
-        stage('6.2- Selenium System Test: Core Features') {
+        stage('6.2- Selenium System Test: Category Features') {
             steps {
-                echo 'Running Core Feature Selenium Tests...'
+                echo 'Running Category Selenium Tests...'
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    sh '''
-                        ./gradlew test \
-                        --tests "com.seyitkarahan.akilli_ajanda_api.seleniumTest.CategoryPageTest" \
-                        --tests "com.seyitkarahan.akilli_ajanda_api.seleniumTest.NotePageTest" \
-                        --tests "com.seyitkarahan.akilli_ajanda_api.seleniumTest.TaskPageTest"
-                    '''
+                    sh './gradlew test --tests "com.seyitkarahan.akilli_ajanda_api.seleniumTest.CategoryPageTest"'
                 }
             }
             post {
@@ -115,14 +110,53 @@ pipeline {
             }
         }
 
-        stage('6.3- Selenium System Test: Media & Events') {
+        stage('6.3- Selenium System Test: Note Features') {
             steps {
-                echo 'Running Media and Event Selenium Tests...'
+                echo 'Running Note Selenium Tests...'
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    sh '''
-                        ./gradlew test \
-                        --tests "com.seyitkarahan.akilli_ajanda_api.seleniumTest.EventPageTest"
-                    '''
+                    sh './gradlew test --tests "com.seyitkarahan.akilli_ajanda_api.seleniumTest.NotePageTest"'
+                }
+            }
+            post {
+                always {
+                    junit 'build/test-results/test/*.xml'
+                }
+            }
+        }
+
+        stage('6.4- Selenium System Test: Task Features') {
+            steps {
+                echo 'Running Task Selenium Tests...'
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    sh './gradlew test --tests "com.seyitkarahan.akilli_ajanda_api.seleniumTest.TaskPageTest"'
+                }
+            }
+            post {
+                always {
+                    junit 'build/test-results/test/*.xml'
+                }
+            }
+        }
+
+        stage('6.5- Selenium System Test: Event Features') {
+            steps {
+                echo 'Running Event Selenium Tests...'
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    sh './gradlew test --tests "com.seyitkarahan.akilli_ajanda_api.seleniumTest.EventPageTest"'
+                }
+            }
+            post {
+                always {
+                    junit 'build/test-results/test/*.xml'
+                }
+            }
+        }
+
+        stage('6.6- Selenium System Test: Image Features') {
+            steps {
+                echo 'Running Image Selenium Tests...'
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    sh './gradlew test --tests "com.seyitkarahan.akilli_ajanda_api.seleniumTest.ImageFilePageTest"'
                 }
             }
             post {
