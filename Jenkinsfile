@@ -152,6 +152,20 @@ pipeline {
             }
         }
 
+        stage('6.6- Selenium System Test: Image Features') {
+            steps {
+                echo 'Running Image Selenium Tests...'
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    sh './gradlew test --tests "com.seyitkarahan.akilli_ajanda_api.seleniumTest.ImageFilePageTest"'
+                }
+            }
+            post {
+                always {
+                    junit 'build/test-results/test/*.xml'
+                }
+            }
+        }
+
         stage('7- Coverage Report') {
             steps {
                 echo 'Generating JaCoCo Coverage Report...'
