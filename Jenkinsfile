@@ -71,7 +71,7 @@ pipeline {
                     echo "Waiting for backend to be ready..."
                     for i in {1..60}; do
                         # Use curl with retry and timeout for a more reliable health check
-                        if curl --retry 5 --retry-delay 2 --connect-timeout 5 -sf http://localhost:8081/login; then
+                        if curl --retry 5 --retry-delay 2 --connect-timeout 5 -sf http://localhost:8081/; then
                             echo "Backend is ready!"
                             break
                         fi
