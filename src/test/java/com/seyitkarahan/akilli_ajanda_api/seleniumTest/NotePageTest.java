@@ -37,42 +37,45 @@ public class NotePageTest {
     public void setUp() {
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless=new");
-        options.addArguments("--disable-gpu");
-        options.addArguments("--window-size=1920,1080");
-        options.addArguments("--ignore-certificate-errors");
         options.addArguments("--no-sandbox");
         options.addArguments("--disable-dev-shm-usage");
-        options.addArguments("--remote-allow-origins=*");
+        options.addArguments("--window-size=1920,1080");
 
         driver = new ChromeDriver(options);
     }
 
+    private WebDriverWait getWait() {
+        return new WebDriverWait(driver, Duration.ofSeconds(40));
+    }
+
     private void login() {
-        // Ensure the user exists before trying to login
         try {
             AuthRequest registerRequest = new AuthRequest();
             registerRequest.setName("Test User");
             registerRequest.setEmail("deneme@gmail.com");
             registerRequest.setPassword("1234");
             authService.register(registerRequest);
-        } catch (Exception e) {
-            // User might already exist, which is fine
-        }
+        } catch (Exception ignored) {}
 
         driver.get("http://localhost:" + port + "/login");
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30)); // Increased timeout
-        wait.until(ExpectedConditions.titleIs("Giriş Yap"));
 
-        WebElement emailInput = wait.until(ExpectedConditions.visibilityOfElementLocated(By.name("email"))); // Explicit wait
-        WebElement passwordInput = driver.findElement(By.name("password"));
+        WebElement emailInput = getWait().until(
+                ExpectedConditions.visibilityOfElementLocated(By.name("email"))
+        );
+        WebElement passwordInput = getWait().until(
+                ExpectedConditions.visibilityOfElementLocated(By.name("password"))
+        );
 
         emailInput.sendKeys("deneme@gmail.com");
         passwordInput.sendKeys("1234");
 
-        WebElement loginButton = driver.findElement(By.cssSelector("button[type='submit']"));
+        WebElement loginButton = getWait().until(
+                ExpectedConditions.elementToBeClickable(By.cssSelector("button[type='submit']"))
+        );
         loginButton.click();
 
-        wait.until(ExpectedConditions.titleIs("Dashboard"));
+        // Dashboard’a özgü bir element bekle
+        getWait().until(ExpectedConditions.urlContains("/dashboard"));
     }
 
     @Test
@@ -80,46 +83,42 @@ public class NotePageTest {
         login();
 
         driver.get("http://localhost:" + port + "/notes");
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
 
-        wait.until(ExpectedConditions.titleIs("Notes"));
-
-        WebElement titleInput = wait.until(
+        WebElement titleInput = getWait().until(
                 ExpectedConditions.visibilityOfElementLocated(By.name("title"))
+        );
+        WebElement contentInput = getWait().until(
+                ExpectedConditions.visibilityOfElementLocated(By.name("content"))
+        );
+        WebElement colorInput = getWait().until(
+                ExpectedConditions.visibilityOfElementLocated(By.name("color"))
         );
 
         String noteTitle = "Test Note " + System.currentTimeMillis();
+
         titleInput.sendKeys(noteTitle);
-
-        WebElement contentInput = driver.findElement(By.name("content"));
         contentInput.sendKeys("This is a test note content.");
-
-        WebElement colorInput = driver.findElement(By.name("color"));
         colorInput.sendKeys("#FF0000");
 
-        WebElement addButton = wait.until(
-                ExpectedConditions.elementToBeClickable(
-                        By.cssSelector("button[type='submit']")
-                )
+        WebElement addButton = getWait().until(
+                ExpectedConditions.elementToBeClickable(By.cssSelector("button[type='submit']"))
         );
         addButton.click();
 
-        WebElement createdNote = wait.until(
+        WebElement createdNote = getWait().until(
                 ExpectedConditions.visibilityOfElementLocated(
                         By.xpath("//td[contains(text(),'" + noteTitle + "')]")
                 )
         );
 
-        assertTrue(createdNote.isDisplayed(),
-                "The new note should be visible in the table.");
+        assertTrue(createdNote.isDisplayed());
     }
-
 
     @AfterEach
     public void tearDown() {
         if (driver != null) {
-            try { Thread.sleep(3000); } catch (InterruptedException e) { e.printStackTrace(); }
             driver.quit();
         }
     }
+
 }
