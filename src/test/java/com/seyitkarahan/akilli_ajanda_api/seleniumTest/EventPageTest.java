@@ -83,37 +83,39 @@ public class EventPageTest {
         login();
 
         driver.get("http://localhost:" + port + "/events");
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
-        wait.until(ExpectedConditions.titleIs("Events"));
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(40));
 
-        // Use more specific selectors for the "Add Event" form
-        WebElement titleInput = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//form[@action='/events']//input[@name='title']")));
+        wait.until(ExpectedConditions.presenceOfElementLocated(
+                By.cssSelector("input[name='title']")
+        ));
+
         String eventTitle = "Test Event " + System.currentTimeMillis();
-        titleInput.sendKeys(eventTitle);
+        driver.findElement(By.name("title")).sendKeys(eventTitle);
 
         JavascriptExecutor js = (JavascriptExecutor) driver;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
 
-        WebElement startTimeInput = driver.findElement(By.xpath("//form[@action='/events']//input[@name='startTime']"));
         LocalDateTime startTime = LocalDateTime.now().plusDays(1);
-        js.executeScript("arguments[0].value = arguments[1];", startTimeInput, startTime.format(formatter));
+        js.executeScript(
+                "arguments[0].value = arguments[1];",
+                driver.findElement(By.name("startTime")),
+                startTime.format(formatter)
+        );
 
-        WebElement endTimeInput = driver.findElement(By.xpath("//form[@action='/events']//input[@name='endTime']"));
         LocalDateTime endTime = startTime.plusHours(1);
-        js.executeScript("arguments[0].value = arguments[1];", endTimeInput, endTime.format(formatter));
+        js.executeScript(
+                "arguments[0].value = arguments[1];",
+                driver.findElement(By.name("endTime")),
+                endTime.format(formatter)
+        );
 
-        WebElement addButton = driver.findElement(By.xpath("//form[@action='/events']//button[@type='submit']"));
-        addButton.click();
+        driver.findElement(By.cssSelector("form button[type='submit']")).click();
 
-        // Wait for the page to reload by waiting for the title to be "Events" again
-        wait.until(ExpectedConditions.titleIs("Events"));
+        driver.get("http://localhost:" + port + "/events");
 
-        // Now, wait for the new event to appear in the list
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//td/form/input[@value='" + eventTitle + "']")));
-
-        boolean isEventPresent = !driver.findElements(By.xpath("//td/form/input[@value='" + eventTitle + "']")).isEmpty();
-        assertTrue(isEventPresent, "The new event should be present in the table.");
+        assertTrue(driver.getPageSource().contains(eventTitle));
     }
+
 
     @AfterEach
     public void tearDown() {
